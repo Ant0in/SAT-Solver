@@ -11,3 +11,6 @@ class OR_Expression(Expression):
 
     def split_expression(self) -> list[list[Expression | Literal]]:
         return [[self.first], [self.second]]
+    
+    def __repr__(self) -> str:
+        return f'({self.first} ∨ {self.second})'

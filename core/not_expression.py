@@ -13,13 +13,22 @@ class NOT_Expression(Expression):
 
     def split_expression(self) -> list[list[Expression | Literal]]:
         
-        ft: Expression | Literal = type(self.first)
+        ft: Expression | Literal = self.first
         
         if isinstance(ft, Literal):
-            self.first.set_apply_not(boolvar=(not self.first.apply_not))
+            self.first.set_apply_not(not self.first.apply_not)
             return [[self.first]]
 
-        # Morgan's rules
-        elif isinstance(ft, AND_Expression): return [[NOT_Expression(first=self.first)], [NOT_Expression(first=self.second)]]
-        elif isinstance(ft, OR_Expression): return [[NOT_Expression(first=self.first), NOT_Expression(first=self.second)]]
-        else: raise NotImplementedError(f'?{ft}')
+        elif isinstance(ft, AND_Expression):
+            # Applique la loi de De Morgan : ¬(A ∧ B) = ¬A ∨ ¬B
+            return [[NOT_Expression(ft.first)], [NOT_Expression(ft.second)]]
+
+        elif isinstance(ft, OR_Expression):
+            # Applique la loi de De Morgan : ¬(A ∨ B) = ¬A ∧ ¬B
+            return [[NOT_Expression(ft.first), NOT_Expression(ft.second)]]
+
+        else:
+            raise NotImplementedError(f'Unsupported type: {type(ft)}')
+
+    def __repr__(self) -> str:
+        return f'(¬{self.first})'

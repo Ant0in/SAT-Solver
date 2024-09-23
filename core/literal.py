@@ -18,4 +18,16 @@ class Literal:
     
     def set_apply_not(self, boolvar: bool) -> None:
         self._apply_NOT = boolvar
+
+    def split_expression(self) -> 'Literal':
+        return [[self]]
+    
+    def __repr__(self) -> str:
+        return f"{'¬' if self.apply_not else ''}{self.name}"
+    
+    def __hash__(self):
+        return hash(self.name)
+    
+    def __eq__(self, other):
+        return isinstance(other, Literal) and self.name == other.name
     

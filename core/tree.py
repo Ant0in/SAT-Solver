@@ -2,50 +2,32 @@
 
 from core.expression import Expression
 from core.literal import Literal
+from core.and_expression import AND_Expression
+from core.or_expression import OR_Expression
+from core.not_expression import NOT_Expression
 
 
+class TreeNode:
 
-class Node:
+    def __init__(self, expression: Expression):
+        self.expression = expression
+        self.left = None  # Pour les sous-expressions
+        self.right = None  # Pour les sous-expressions
 
-    def __init__(self, expression) -> None:
+    def decompose(self):
+        if isinstance(self.expression, Literal):
+            return [[self.expression]]
         
-        self.expression: list[Expression | Literal] = expression
-        self.childrens: list['Node'] = []
+        # Pour OR et AND, décomposer récursivement
+        if isinstance(self.expression, OR_Expression):
+            left_decomp = TreeNode(self.left).decompose()  # Decomposition gauche
+            right_decomp = TreeNode(self.right).decompose()  # Decomposition droite
+            return left_decomp + right_decomp  # Combiner les deux décompositions
 
-    def is_literal(self) -> bool:
+        elif isinstance(self.expression, AND_Expression):
+            return [[self.left.expression, self.right.expression]]  # Tout doit être ensemble
 
-        for p in self.expression:
-            if isinstance(p, Expression): return False
-        return True
-    
-    def add_children(self, n: 'Node') -> None:
-        assert isinstance(n, Node)
-        self.childrens.append(n)
+        elif isinstance(self.expression, NOT_Expression):
+            return [[self.expression.first]]  # Pour NOT, on peut le traiter comme une clause
 
-
-
-class Tree:
-
-    def __init__(self, root: Node) -> None:
-        self.root: Node = root
-
-    def get_leaves(self) -> list[Node]:
-
-        stack: list = [self.root]
-        visited: set = set()
-        ret: list = list()
-
-        while stack:
-            
-            current: Node = stack.pop()
-            if current not in visited:
-                visited.add(current)
-
-                if not c.childrens:
-                    ret.append(current)
-                    continue
-
-                for c in current.childrens:
-                    stack.append(c)
-
-        return ret
+        return []
