@@ -1,10 +1,9 @@
 
 
 from core.literal import Literal
-from abc import abstractmethod, ABC
 
 
-class Expression(ABC):
+class Expression:
 
     def __init__(self, first:'Expression | Literal', second: 'Expression | Literal' = None) -> None:
         
@@ -18,8 +17,3 @@ class Expression(ABC):
     @property
     def second(self) -> 'Expression | Literal':
         return self._second
-    
-    @abstractmethod
-    def split_expression(self) -> list[list['Expression | Literal']]:
-        """"""
-

@@ -7,27 +7,58 @@ from core.or_expression import OR_Expression
 from core.not_expression import NOT_Expression
 
 
-class TreeNode:
+class Node:
 
-    def __init__(self, expression: Expression):
-        self.expression = expression
-        self.left = None  # Pour les sous-expressions
-        self.right = None  # Pour les sous-expressions
+    def __init__(self, expression: Expression | Literal) -> None:
 
-    def decompose(self):
-        if isinstance(self.expression, Literal):
-            return [[self.expression]]
+        self.expression: list[Expression | Literal] = [expression]
+        self.children: list[Expression | Literal] = list()
+    
+    def add_children(self, child: 'Expression | Literal') -> None:
+        self.children.append(child)
+
+
+
+class ExpressionTree:
+
+    def __init__(self, root: Node) -> None:
+        self.root = root
+
+    def split_tree(self) -> list[list[Literal]]:
+        return self._split_node(self.root)
+
+    def _split_node(self, node: Node) -> list[list[Literal]]:
         
-        # Pour OR et AND, décomposer récursivement
-        if isinstance(self.expression, OR_Expression):
-            left_decomp = TreeNode(self.left).decompose()  # Decomposition gauche
-            right_decomp = TreeNode(self.right).decompose()  # Decomposition droite
-            return left_decomp + right_decomp  # Combiner les deux décompositions
+        # Lets take the first expression of the node.
+        expr: Expression = node.expression[0]
 
-        elif isinstance(self.expression, AND_Expression):
-            return [[self.left.expression, self.right.expression]]  # Tout doit être ensemble
+        # If it's a literal, then it's already simplified.
+        if isinstance(expr, Literal):
+            return [[expr]]
 
-        elif isinstance(self.expression, NOT_Expression):
-            return [[self.expression.first]]  # Pour NOT, on peut le traiter comme une clause
+        # If it's an AND, we have to combine left and right branches.
+        if isinstance(expr, AND_Expression):
+            left_branches: list[list[Literal]] = self._split_node(Node(expr.first))
+            right_branches: list[list[Literal]] = self._split_node(Node(expr.second))
+            # Combine les branches de gauche avec celles de droite.
+            return [left_branch + right_branch for left_branch in left_branches for right_branch in right_branches]
 
-        return []
+        # If it's an OR, we branch.
+        elif isinstance(expr, OR_Expression):
+            left_branches: list[list[Literal]] = self._split_node(Node(expr.first))
+            right_branches: list[list[Literal]] = self._split_node(Node(expr.second))
+            # Chaque côté du OR devient une branche.
+            return left_branches + right_branches
+
+        # if it's a NOT, we use Morgan's laws.
+        elif isinstance(expr, NOT_Expression):
+            
+            negated_expressions = expr.morgan_laws_split()
+            result_branches = []
+            for branch in negated_expressions:
+                result_branches.extend(self._split_node(Node(branch[0])))
+            return result_branches
+
+        else:
+            raise ValueError(f"Type d'expression non supporté : {type(expr)}")
+

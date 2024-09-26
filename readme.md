@@ -1,2 +1,2 @@
 
-SAT Solver for Python 
+SAT Solver for Python

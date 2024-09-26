@@ -11,7 +11,7 @@ class NOT_Expression(Expression):
     def __init__(self, first: Expression | Literal) -> None:
         super().__init__(first, None)
 
-    def split_expression(self) -> list[list[Expression | Literal]]:
+    def morgan_laws_split(self) -> list[list[Expression | Literal]]:
         
         ft: Expression | Literal = self.first
         

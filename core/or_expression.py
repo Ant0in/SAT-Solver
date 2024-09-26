@@ -9,8 +9,5 @@ class OR_Expression(Expression):
     def __init__(self, first: Expression | Literal, second: Expression | Literal) -> None:
         super().__init__(first, second)
 
-    def split_expression(self) -> list[list[Expression | Literal]]:
-        return [[self.first], [self.second]]
-    
     def __repr__(self) -> str:
-        return f'({self.first} ∨ {self.second})'
+        return f'({self.first} v {self.second})'

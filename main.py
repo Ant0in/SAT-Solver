@@ -1,14 +1,22 @@
 
+
 from core.literal import Literal
 from core.and_expression import AND_Expression
 from core.not_expression import NOT_Expression
 from core.or_expression import OR_Expression
-from scripts.create_expression_tree import ExpressionTreeHelper
+
+from scripts.process_expression import ProcessHelper
 
 
 
-e: list = AND_Expression(OR_Expression(Literal('x'), Literal('y')), AND_Expression(NOT_Expression(Literal('x')), NOT_Expression(Literal('y'))))
-h: ExpressionTreeHelper = ExpressionTreeHelper(expression=e)
+if __name__ == '__main__':
+    
+    # Création des littéraux
+    literal_A = Literal('A')
+    literal_B = Literal('B')
+    literal_C = Literal('C')
+    literal_D = Literal('D')
 
-print(e)
-print(h.expression_tree.decompose())
+    e = OR_Expression(AND_Expression(literal_A, literal_B), AND_Expression(NOT_Expression(literal_A), NOT_Expression(literal_B)))
+
+    print(ProcessHelper.process_expression(e))
